@@ -350,7 +350,7 @@
     // PDF READER SYSTEM
     // ==================================
 
-    const API_BASE_URL = "YOUR_RENDER_BACKEND_URL";
+    const PDF_API_BASE_URL = "https://keyraddiin-personal-ai-nemg.onrender.com";
 
 
     let currentPDFText = "";
@@ -438,7 +438,7 @@
             formData.append("file", file);
 
             const response = await fetch(
-                API_BASE_URL + "/pdf/upload",
+                PDF_API_BASE_URL + "/pdf/upload",
                 {
                     method: "POST",
                     body: formData
@@ -516,7 +516,7 @@
         try {
 
             const response = await fetch(
-                API_BASE_URL + "/pdf/ask",
+                PDF_API_BASE_URL + "/pdf/ask",
                 {
                     method: "POST",
 

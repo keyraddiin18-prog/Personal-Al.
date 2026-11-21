@@ -5,7 +5,7 @@
 
 
 // API CONFIGURATION
-const API_BASE_URL = "YOUR_RENDER_BACKEND_URL";
+const API_BASE_URL = "https://keyraddiin-personal-ai-nemg.onrender.com";
 
 
 // HTML ELEMENTS
@@ -81,13 +81,10 @@ async function sendMessage() {
 
     if (!message) return;
 
-    if (
-        API_BASE_URL === "YOUR_RENDER_BACKEND_URL" ||
-        !API_BASE_URL
-    ) {
+    if (!API_BASE_URL) {
 
         addMessage(
-            "Backend URL is not configured yet. Please wait for deployment.",
+            "Backend URL is not configured yet.",
             "ai"
         );
 
@@ -96,7 +93,6 @@ async function sendMessage() {
     }
 
 
-    // Remove welcome screen
     const welcome = document.querySelector(".welcome");
 
     if (welcome) {
@@ -104,11 +100,9 @@ async function sendMessage() {
     }
 
 
-    // Display user message
     addMessage(message, "user");
 
 
-    // Save user message locally
     chatHistory.push({
         role: "user",
         content: message
@@ -117,7 +111,6 @@ async function sendMessage() {
     saveHistory();
 
 
-    // Clear input
     userInput.value = "";
 
     userInput.disabled = true;
@@ -127,7 +120,6 @@ async function sendMessage() {
     }
 
 
-    // Loading message
     const loading = addMessage(
         "KEYRADDIIN AI is thinking...",
         "ai"
@@ -136,7 +128,6 @@ async function sendMessage() {
 
     try {
 
-        // CONNECT TO BACKEND
         const response = await fetch(
             `${API_BASE_URL}/chat`,
             {
@@ -166,7 +157,6 @@ async function sendMessage() {
         loading.remove();
 
 
-        // CHECK RESPONSE
         if (!response.ok || !data.success) {
 
             throw new Error(
@@ -178,7 +168,6 @@ async function sendMessage() {
         }
 
 
-        // SAVE CHAT ID
         if (data.chat_id) {
 
             currentChatId = String(data.chat_id);
@@ -191,16 +180,13 @@ async function sendMessage() {
         }
 
 
-        // GET AI RESPONSE
         const aiResponse = data.response ||
             "I could not generate a response.";
 
 
-        // DISPLAY AI RESPONSE
         addMessage(aiResponse, "ai");
 
 
-        // SAVE AI RESPONSE
         chatHistory.push({
 
             role: "assistant",
