@@ -1,25 +1,41 @@
 // =============================================
 // KEYRADDIIN PERSONAL AI V2.0
-// FRONTEND + BACKEND CONNECTION
+// PROFESSIONAL FRONTEND CHAT SYSTEM
 // =============================================
 
 
+// =============================================
 // API CONFIGURATION
-const API_BASE_URL = "https://keyraddiin-personal-ai-nemg.onrender.com";
+// =============================================
+
+const API_BASE_URL =
+    "https://keyraddiin-personal-ai-v2.onrender.com";
 
 
+// =============================================
 // HTML ELEMENTS
-const chatArea = document.getElementById("chatArea");
+// =============================================
+
+const chatArea = document.getElementById("chatSection");
+
 const userInput = document.getElementById("userInput");
+
 const sendBtn = document.getElementById("sendBtn");
 
 
-// LOCAL STORAGE KEYS
+// =============================================
+// LOCAL STORAGE
+// =============================================
+
 const HISTORY_KEY = "keyraddiin_chat_history";
+
 const CHAT_ID_KEY = "keyraddiin_chat_id";
 
 
+// =============================================
 // CHAT DATA
+// =============================================
+
 let chatHistory = [];
 
 let currentChatId =
@@ -27,7 +43,59 @@ let currentChatId =
 
 
 // =============================================
-// LOAD SAVED CHAT HISTORY
+// API REQUEST HELPER
+// =============================================
+
+async function apiRequest(endpoint, options = {}) {
+
+    const response = await fetch(
+        `${API_BASE_URL}${endpoint}`,
+        options
+    );
+
+    const contentType =
+        response.headers.get("content-type") || "";
+
+    let data;
+
+    if (contentType.includes("application/json")) {
+        data = await response.json();
+    } else {
+        data = {
+            detail: await response.text()
+        };
+    }
+
+    if (!response.ok) {
+
+        throw new Error(
+            data.detail ||
+            data.error ||
+            `Server error: ${response.status}`
+        );
+
+    }
+
+    return data;
+
+}
+
+
+// =============================================
+// CHECK HTML ELEMENTS
+// =============================================
+
+if (!chatArea || !userInput || !sendBtn) {
+
+    console.error(
+        "KEYRADDIIN AI ERROR: Required HTML elements not found."
+    );
+
+}
+
+
+// =============================================
+// LOAD CHAT HISTORY
 // =============================================
 
 function loadHistory() {
@@ -42,14 +110,21 @@ function loadHistory() {
             chatHistory = [];
         }
 
-        chatArea.innerHTML = "";
-
         if (chatHistory.length === 0) {
-            showWelcome();
             return;
         }
 
+        const welcome = chatArea.querySelector(".welcome");
+
+        if (welcome) {
+            welcome.remove();
+        }
+
         chatHistory.forEach(message => {
+
+            if (!message || typeof message.content !== "string") {
+                return;
+            }
 
             addMessage(
                 message.content,
@@ -63,8 +138,6 @@ function loadHistory() {
         console.error("History loading error:", error);
 
         chatHistory = [];
-
-        showWelcome();
 
     }
 
@@ -81,10 +154,13 @@ async function sendMessage() {
 
     if (!message) return;
 
+    if (sendBtn.disabled) return;
+
+
     if (!API_BASE_URL) {
 
         addMessage(
-            "Backend URL is not configured yet.",
+            "Backend URL is not configured.",
             "ai"
         );
 
@@ -93,32 +169,41 @@ async function sendMessage() {
     }
 
 
-    const welcome = document.querySelector(".welcome");
+    const welcome = chatArea.querySelector(".welcome");
 
     if (welcome) {
         welcome.remove();
     }
 
 
+    // DISPLAY USER MESSAGE
+
     addMessage(message, "user");
 
 
+    // SAVE USER MESSAGE
+
     chatHistory.push({
+
         role: "user",
+
         content: message
+
     });
 
     saveHistory();
 
 
+    // CLEAR INPUT
+
     userInput.value = "";
 
     userInput.disabled = true;
 
-    if (sendBtn) {
-        sendBtn.disabled = true;
-    }
+    sendBtn.disabled = true;
 
+
+    // LOADING MESSAGE
 
     const loading = addMessage(
         "KEYRADDIIN AI is thinking...",
@@ -128,13 +213,18 @@ async function sendMessage() {
 
     try {
 
-        const response = await fetch(
-            `${API_BASE_URL}/chat`,
+        // SEND REQUEST TO BACKEND
+
+        const data = await apiRequest(
+            "/chat",
             {
+
                 method: "POST",
 
                 headers: {
+
                     "Content-Type": "application/json"
+
                 },
 
                 body: JSON.stringify({
@@ -151,22 +241,23 @@ async function sendMessage() {
         );
 
 
-        const data = await response.json();
-
+        // REMOVE LOADING
 
         loading.remove();
 
 
-        if (!response.ok || !data.success) {
+        // CHECK API RESPONSE
+
+        if (!data.success) {
 
             throw new Error(
-                data.detail ||
-                data.error ||
-                "AI request failed."
+                data.error || "AI request failed."
             );
 
         }
 
+
+        // SAVE CHAT ID
 
         if (data.chat_id) {
 
@@ -180,12 +271,19 @@ async function sendMessage() {
         }
 
 
-        const aiResponse = data.response ||
+        // GET AI RESPONSE
+
+        const aiResponse =
+            data.response ||
             "I could not generate a response.";
 
 
+        // DISPLAY AI RESPONSE
+
         addMessage(aiResponse, "ai");
 
+
+        // SAVE AI RESPONSE
 
         chatHistory.push({
 
@@ -206,19 +304,20 @@ async function sendMessage() {
 
 
         addMessage(
+
             "Connection error: " +
             error.message +
-            "\nPlease try again.",
+            "\n\nPlease check your internet connection and try again.",
+
             "ai"
+
         );
 
     } finally {
 
         userInput.disabled = false;
 
-        if (sendBtn) {
-            sendBtn.disabled = false;
-        }
+        sendBtn.disabled = false;
 
         userInput.focus();
 
@@ -233,64 +332,74 @@ async function sendMessage() {
 
 function addMessage(text, sender) {
 
-    const messageDiv = document.createElement("div");
+    const row = document.createElement("div");
 
-    messageDiv.style.maxWidth = "750px";
-
-    messageDiv.style.margin = "20px auto";
-
-    messageDiv.style.padding = "16px";
-
-    messageDiv.style.borderRadius = "14px";
-
-    messageDiv.style.lineHeight = "1.7";
-
-    messageDiv.style.fontSize = "14px";
-
-    messageDiv.style.whiteSpace = "pre-wrap";
-
-    messageDiv.style.overflowWrap = "anywhere";
+    row.className =
+        "message-row " +
+        (sender === "user" ? "user" : "ai");
 
 
-    if (sender === "user") {
+    const bubble = document.createElement("div");
 
-        messageDiv.style.background = "#172c50";
-
-        messageDiv.style.border = "1px solid #315b99";
-
-    } else {
-
-        messageDiv.style.background = "#111b31";
-
-        messageDiv.style.border = "1px solid #263957";
-
-    }
+    bubble.className = "message-bubble";
 
 
-    messageDiv.textContent = text;
+    const label = document.createElement("span");
 
-    chatArea.appendChild(messageDiv);
+    label.className = "message-label";
+
+    label.textContent =
+        sender === "user"
+            ? "YOU"
+            : "✦ KEYRADDIIN AI";
+
+
+    const content = document.createElement("div");
+
+    content.textContent = String(text);
+
+
+    bubble.appendChild(label);
+
+    bubble.appendChild(content);
+
+    row.appendChild(bubble);
+
+    chatArea.appendChild(row);
+
 
     chatArea.scrollTop = chatArea.scrollHeight;
 
-    return messageDiv;
+
+    return row;
 
 }
 
 
 // =============================================
-// SAVE HISTORY
+// SAVE CHAT HISTORY
 // =============================================
 
 function saveHistory() {
 
-    localStorage.setItem(
+    try {
 
-        HISTORY_KEY,
+        localStorage.setItem(
 
-        JSON.stringify(chatHistory)
+            HISTORY_KEY,
 
-    );
+            JSON.stringify(chatHistory)
+
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Could not save chat history:",
+            error
+        );
+
+    }
 
 }
 
@@ -311,7 +420,12 @@ function newChat() {
     localStorage.removeItem(CHAT_ID_KEY);
 
 
+    chatArea.innerHTML = "";
+
     showWelcome();
+
+
+    console.log("NEW CHAT STARTED");
 
 }
 
@@ -328,9 +442,31 @@ function showWelcome() {
 
             <div class="ai-icon">✦</div>
 
-            <h1>Hello! Welcome to KEYRADDIIN AI.</h1>
+            <h1>
+                Hello! Welcome to KEYRADDIIN AI.
+            </h1>
 
-            <p>Your personal intelligent assistant.</p>
+            <p>
+                Your personal intelligent assistant.
+                Ask me anything and let's explore
+                knowledge together.
+            </p>
+
+            <div class="suggestions">
+
+                <button onclick="suggest('Explain science to me')">
+                    🔬 Explain Science
+                </button>
+
+                <button onclick="suggest('Help me study Grade 10')">
+                    📚 Study Assistant
+                </button>
+
+                <button onclick="suggest('Translate English to Afaan Oromo')">
+                    🌍 Translation
+                </button>
+
+            </div>
 
         </div>
 
@@ -356,46 +492,40 @@ function suggest(message) {
 // ENTER TO SEND
 // =============================================
 
-userInput.addEventListener("keydown", function(event) {
+userInput.addEventListener(
 
-    if (
-        event.key === "Enter" &&
-        !event.shiftKey
-    ) {
+    "keydown",
 
-        event.preventDefault();
+    function(event) {
 
-        sendMessage();
+        if (
+            event.key === "Enter" &&
+            !event.shiftKey
+        ) {
+
+            event.preventDefault();
+
+            sendMessage();
+
+        }
 
     }
 
-});
+);
 
 
 // =============================================
-// SEND BUTTON
-// =============================================
-
-if (
-    sendBtn &&
-    !sendBtn.hasAttribute("onclick")
-) {
-
-    sendBtn.addEventListener(
-        "click",
-        sendMessage
-    );
-
-}
-
-
-// =============================================
-// INITIALIZE APP
+// INITIALIZE APPLICATION
 // =============================================
 
 loadHistory();
 
 
 console.log(
-    "KEYRADDIIN PERSONAL AI V2.0 Connected Frontend Loaded!"
+    "KEYRADDIIN PERSONAL AI V2.0 READY!"
+);
+
+console.log(
+    "BACKEND:",
+    API_BASE_URL
 );

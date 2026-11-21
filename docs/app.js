@@ -1,7 +1,6 @@
 // =============================================
 // KEYRADDIIN PERSONAL AI V2.0
-// COMPLETE FRONTEND CHAT SYSTEM
-// Compatible with frontend/index.html
+// PROFESSIONAL FRONTEND CHAT SYSTEM
 // =============================================
 
 
@@ -10,7 +9,7 @@
 // =============================================
 
 const API_BASE_URL =
-    "https://keyraddiin-personal-ai-nemg.onrender.com";
+    "https://keyraddiin-personal-ai-v2.onrender.com";
 
 
 // =============================================
@@ -44,6 +43,45 @@ let currentChatId =
 
 
 // =============================================
+// API REQUEST HELPER
+// =============================================
+
+async function apiRequest(endpoint, options = {}) {
+
+    const response = await fetch(
+        `${API_BASE_URL}${endpoint}`,
+        options
+    );
+
+    const contentType =
+        response.headers.get("content-type") || "";
+
+    let data;
+
+    if (contentType.includes("application/json")) {
+        data = await response.json();
+    } else {
+        data = {
+            detail: await response.text()
+        };
+    }
+
+    if (!response.ok) {
+
+        throw new Error(
+            data.detail ||
+            data.error ||
+            `Server error: ${response.status}`
+        );
+
+    }
+
+    return data;
+
+}
+
+
+// =============================================
 // CHECK HTML ELEMENTS
 // =============================================
 
@@ -69,26 +107,24 @@ function loadHistory() {
         chatHistory = saved ? JSON.parse(saved) : [];
 
         if (!Array.isArray(chatHistory)) {
-
             chatHistory = [];
-
         }
 
         if (chatHistory.length === 0) {
-
             return;
-
         }
 
         const welcome = chatArea.querySelector(".welcome");
 
         if (welcome) {
-
             welcome.remove();
-
         }
 
         chatHistory.forEach(message => {
+
+            if (!message || typeof message.content !== "string") {
+                return;
+            }
 
             addMessage(
                 message.content,
@@ -97,14 +133,9 @@ function loadHistory() {
 
         });
 
-    }
+    } catch (error) {
 
-    catch (error) {
-
-        console.error(
-            "History loading error:",
-            error
-        );
+        console.error("History loading error:", error);
 
         chatHistory = [];
 
@@ -123,6 +154,8 @@ async function sendMessage() {
 
     if (!message) return;
 
+    if (sendBtn.disabled) return;
+
 
     if (!API_BASE_URL) {
 
@@ -136,28 +169,19 @@ async function sendMessage() {
     }
 
 
-    // Prevent duplicate requests
-
-    if (sendBtn.disabled) return;
-
-
-    // Remove welcome screen
-
     const welcome = chatArea.querySelector(".welcome");
 
     if (welcome) {
-
         welcome.remove();
-
     }
 
 
-    // Display user message
+    // DISPLAY USER MESSAGE
 
     addMessage(message, "user");
 
 
-    // Save user message
+    // SAVE USER MESSAGE
 
     chatHistory.push({
 
@@ -170,7 +194,7 @@ async function sendMessage() {
     saveHistory();
 
 
-    // Clear input
+    // CLEAR INPUT
 
     userInput.value = "";
 
@@ -179,7 +203,7 @@ async function sendMessage() {
     sendBtn.disabled = true;
 
 
-    // Loading message
+    // LOADING MESSAGE
 
     const loading = addMessage(
         "KEYRADDIIN AI is thinking...",
@@ -189,10 +213,10 @@ async function sendMessage() {
 
     try {
 
-        // Send request
+        // SEND REQUEST TO BACKEND
 
-        const response = await fetch(
-            `${API_BASE_URL}/chat`,
+        const data = await apiRequest(
+            "/chat",
             {
 
                 method: "POST",
@@ -217,30 +241,23 @@ async function sendMessage() {
         );
 
 
-        const data = await response.json();
-
-
-        // Remove loading message
+        // REMOVE LOADING
 
         loading.remove();
 
 
-        // Check response
+        // CHECK API RESPONSE
 
-        if (!response.ok || !data.success) {
+        if (!data.success) {
 
             throw new Error(
-
-                data.detail ||
-                data.error ||
-                "AI request failed."
-
+                data.error || "AI request failed."
             );
 
         }
 
 
-        // Save chat ID
+        // SAVE CHAT ID
 
         if (data.chat_id) {
 
@@ -254,19 +271,19 @@ async function sendMessage() {
         }
 
 
-        // Get AI response
+        // GET AI RESPONSE
 
         const aiResponse =
             data.response ||
             "I could not generate a response.";
 
 
-        // Display AI response
+        // DISPLAY AI RESPONSE
 
         addMessage(aiResponse, "ai");
 
 
-        // Save AI response
+        // SAVE AI RESPONSE
 
         chatHistory.push({
 
@@ -279,31 +296,24 @@ async function sendMessage() {
         saveHistory();
 
 
-    }
-
-    catch (error) {
+    } catch (error) {
 
         loading.remove();
 
-        console.error(
-            "CHAT ERROR:",
-            error
-        );
+        console.error("CHAT ERROR:", error);
 
 
         addMessage(
 
             "Connection error: " +
             error.message +
-            "\nPlease try again.",
+            "\n\nPlease check your internet connection and try again.",
 
             "ai"
 
         );
 
-    }
-
-    finally {
+    } finally {
 
         userInput.disabled = false;
 
@@ -322,56 +332,46 @@ async function sendMessage() {
 
 function addMessage(text, sender) {
 
-    const messageDiv = document.createElement("div");
+    const row = document.createElement("div");
 
-    messageDiv.style.maxWidth = "750px";
-
-    messageDiv.style.margin = "20px auto";
-
-    messageDiv.style.padding = "16px";
-
-    messageDiv.style.borderRadius = "14px";
-
-    messageDiv.style.lineHeight = "1.7";
-
-    messageDiv.style.fontSize = "14px";
-
-    messageDiv.style.whiteSpace = "pre-wrap";
-
-    messageDiv.style.overflowWrap = "anywhere";
+    row.className =
+        "message-row " +
+        (sender === "user" ? "user" : "ai");
 
 
-    if (sender === "user") {
+    const bubble = document.createElement("div");
 
-        messageDiv.style.background = "#172c50";
-
-        messageDiv.style.border =
-            "1px solid #315b99";
-
-        messageDiv.style.marginLeft = "auto";
-
-    }
-
-    else {
-
-        messageDiv.style.background = "#111b31";
-
-        messageDiv.style.border =
-            "1px solid #263957";
-
-        messageDiv.style.marginRight = "auto";
-
-    }
+    bubble.className = "message-bubble";
 
 
-    messageDiv.textContent = text;
+    const label = document.createElement("span");
 
-    chatArea.appendChild(messageDiv);
+    label.className = "message-label";
+
+    label.textContent =
+        sender === "user"
+            ? "YOU"
+            : "✦ KEYRADDIIN AI";
+
+
+    const content = document.createElement("div");
+
+    content.textContent = String(text);
+
+
+    bubble.appendChild(label);
+
+    bubble.appendChild(content);
+
+    row.appendChild(bubble);
+
+    chatArea.appendChild(row);
+
 
     chatArea.scrollTop = chatArea.scrollHeight;
 
 
-    return messageDiv;
+    return row;
 
 }
 
@@ -392,9 +392,7 @@ function saveHistory() {
 
         );
 
-    }
-
-    catch (error) {
+    } catch (error) {
 
         console.error(
             "Could not save chat history:",
@@ -425,6 +423,9 @@ function newChat() {
     chatArea.innerHTML = "";
 
     showWelcome();
+
+
+    console.log("NEW CHAT STARTED");
 
 }
 
@@ -498,10 +499,8 @@ userInput.addEventListener(
     function(event) {
 
         if (
-
             event.key === "Enter" &&
             !event.shiftKey
-
         ) {
 
             event.preventDefault();
@@ -524,4 +523,9 @@ loadHistory();
 
 console.log(
     "KEYRADDIIN PERSONAL AI V2.0 READY!"
+);
+
+console.log(
+    "BACKEND:",
+    API_BASE_URL
 );

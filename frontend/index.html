@@ -2,119 +2,477 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#080f1e">
+    <meta name="description" content="KEYRADDIIN PERSONAL AI V2.0 - Your intelligent personal assistant.">
 
-    <title>KEYRADDIIN PERSONAL AI</title>
+    <title>KEYRADDIIN PERSONAL AI | V2.0</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="style.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        button {
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        button:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        textarea {
+            font-family: inherit;
+        }
+
+        .message-row {
+            width: 100%;
+            display: flex;
+            margin: 18px auto;
+            padding: 0 15px;
+        }
+
+        .message-row.user {
+            justify-content: flex-end;
+        }
+
+        .message-row.ai {
+            justify-content: flex-start;
+        }
+
+        .message-bubble {
+            max-width: 780px;
+            padding: 15px 18px;
+            border-radius: 16px;
+            line-height: 1.75;
+            font-size: 14px;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+
+        .message-row.user .message-bubble {
+            background: #172c50;
+            border: 1px solid #315b99;
+        }
+
+        .message-row.ai .message-bubble {
+            background: #111b31;
+            border: 1px solid #263957;
+        }
+
+        .message-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 7px;
+            opacity: 0.7;
+            letter-spacing: 0.5px;
+        }
+
+        .chat-area {
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        .welcome {
+            text-align: center;
+            margin: auto;
+            padding: 35px 18px;
+            max-width: 750px;
+        }
+
+        .welcome h1 {
+            font-size: clamp(23px, 5vw, 34px);
+            margin: 20px 0 12px;
+        }
+
+        .welcome p {
+            line-height: 1.8;
+            opacity: 0.75;
+        }
+
+        .ai-icon {
+            width: 65px;
+            height: 65px;
+            display: grid;
+            place-items: center;
+            margin: auto;
+            border-radius: 20px;
+            font-size: 30px;
+            background: linear-gradient(135deg, #174a9c, #6c45d9);
+            box-shadow: 0 10px 35px #315b9950;
+        }
+
+        .suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .suggestions button {
+            padding: 12px 15px;
+            border: 1px solid #263957;
+            border-radius: 12px;
+            background: #111b31;
+            color: #e8efff;
+            font-size: 12px;
+        }
+
+        .suggestions button:hover {
+            border-color: #4d82d5;
+            background: #172c50;
+        }
+
+        .input-container textarea {
+            resize: none;
+            min-height: 45px;
+            max-height: 150px;
+        }
+
+        .tool-section {
+            padding: 25px;
+            overflow-y: auto;
+        }
+
+        .section-heading {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .section-heading h1 {
+            margin: 0 0 7px;
+        }
+
+        .section-heading p {
+            margin: 0;
+            opacity: 0.7;
+            line-height: 1.6;
+        }
+
+        .section-icon {
+            width: 50px;
+            height: 50px;
+            display: grid;
+            place-items: center;
+            border-radius: 14px;
+            background: #172c50;
+            font-size: 23px;
+        }
+
+        .pdf-card,
+        .feature-card {
+            max-width: 850px;
+            margin-bottom: 22px;
+            padding: 23px;
+            border: 1px solid #263957;
+            border-radius: 16px;
+            background: #111b31;
+        }
+
+        .pdf-card h3,
+        .feature-card h3 {
+            margin-top: 0;
+        }
+
+        .pdf-card p,
+        .feature-card p {
+            line-height: 1.7;
+            opacity: 0.75;
+        }
+
+        .pdf-card input,
+        .pdf-card textarea {
+            width: 100%;
+            margin: 12px 0;
+            padding: 13px;
+            border: 1px solid #315b99;
+            border-radius: 10px;
+            background: #080f1e;
+            color: white;
+        }
+
+        .primary-btn {
+            padding: 13px 19px;
+            border: none;
+            border-radius: 10px;
+            background: #2563c7;
+            color: white;
+            font-weight: 700;
+        }
+
+        .primary-btn:hover {
+            background: #3479e5;
+        }
+
+        .tool-status,
+        .pdf-answer {
+            margin-top: 15px;
+            padding: 12px;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+
+        .pdf-answer {
+            border-radius: 10px;
+            background: #080f1e;
+        }
+
+        .sidebar-overlay {
+            z-index: 90;
+        }
+
+        .sidebar {
+            z-index: 100;
+        }
+
+        .topbar {
+            z-index: 20;
+        }
+
+        @media(max-width: 600px) {
+            .tool-section {
+                padding: 16px;
+            }
+
+            .pdf-card,
+            .feature-card {
+                padding: 17px;
+            }
+
+            .message-bubble {
+                max-width: 92%;
+                font-size: 13px;
+            }
+
+            .welcome {
+                padding: 20px 12px;
+            }
+
+            .suggestions button {
+                width: 100%;
+            }
+        }
+    </style>
 
 </head>
 
 <body>
 
-<div class="app">
+<div class="app-container">
+
+    <!-- MOBILE OVERLAY -->
+
+    <div
+        id="sidebarOverlay"
+        class="sidebar-overlay"
+        onclick="closeSidebar()">
+    </div>
+
 
     <!-- SIDEBAR -->
 
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar">
 
-        <div class="brand">
+        <div class="sidebar-header">
 
-            <div class="logo">K</div>
+            <div class="brand-icon">✦</div>
 
-            <div>
+            <div class="brand-info">
                 <h2>KEYRADDIIN</h2>
-                <span>PERSONAL AI</span>
+                <span>PERSONAL AI V2.0</span>
             </div>
 
+            <button
+                class="close-sidebar"
+                onclick="closeSidebar()"
+                aria-label="Close sidebar">
+                ✕
+            </button>
+
         </div>
 
-        <button class="new-chat" onclick="newChat()">
-            + New Chat
+
+        <button
+            class="new-chat-btn"
+            onclick="startNewChat()">
+
+            <span>＋</span>
+            <span>New Chat</span>
+
         </button>
 
-        <div class="menu">
 
-            <p class="menu-title">MENU</p>
-
-            <button class="menu-item active"
-                    onclick="showSection('chatSection', this)">
-                💬 AI Chat
-            </button>
-
-            <button class="menu-item"
-                    onclick="showSection('chatSection', this)">
-                🧠 AI Memory
-            </button>
-
-            <button class="menu-item"
-                    onclick="showSection('chatSection', this)">
-                📚 AI Teacher
-            </button>
-
-            <button class="menu-item"
-                    onclick="showSection('pdfSection', this)">
-                📄 PDF Reader
-            </button>
-
-            <button class="menu-item"
-                    onclick="showSection('chatSection', this)">
-                🎙️ Voice Assistant
-            </button>
-
-            <button class="menu-item"
-                    onclick="showSection('chatSection', this)">
-                ⚙️ Settings
-            </button>
-
+        <div class="sidebar-label">
+            WORKSPACE
         </div>
 
-        <div class="sidebar-footer">
 
-            <span>KEYRADDIIN MEDIA</span>
+        <nav class="navigation">
 
-            <small>Version 2.0</small>
+            <button
+                class="nav-item active"
+                onclick="showSection('chatSection', this)">
+
+                <span class="nav-icon">◈</span>
+                <span>AI Chat</span>
+
+            </button>
+
+
+            <button
+                class="nav-item"
+                onclick="showSection('memorySection', this)">
+
+                <span class="nav-icon">▣</span>
+                <span>AI Memory</span>
+
+            </button>
+
+
+            <button
+                class="nav-item"
+                onclick="showSection('teacherSection', this)">
+
+                <span class="nav-icon">✎</span>
+                <span>AI Teacher</span>
+
+            </button>
+
+
+            <button
+                class="nav-item"
+                onclick="showSection('pdfSection', this)">
+
+                <span class="nav-icon">▤</span>
+                <span>PDF Reader</span>
+
+            </button>
+
+
+            <button
+                class="nav-item"
+                onclick="showSection('voiceSection', this)">
+
+                <span class="nav-icon">◉</span>
+                <span>Voice Assistant</span>
+
+            </button>
+
+
+            <button
+                class="nav-item"
+                onclick="showSection('settingsSection', this)">
+
+                <span class="nav-icon">⚙</span>
+                <span>Settings</span>
+
+            </button>
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+            <div class="sidebar-status">
+
+                <span class="status-dot"></span>
+
+                <div>
+                    <strong>System Online</strong>
+                    <small>Backend API connected</small>
+                </div>
+
+            </div>
+
+
+            <div class="sidebar-footer">
+
+                <span>POWERED BY</span>
+
+                <strong>KEYRADDIIN MEDIA</strong>
+
+                <small>© 2026 All rights reserved</small>
+
+            </div>
 
         </div>
 
     </aside>
 
 
-    <!-- MAIN AREA -->
+    <!-- MAIN CONTENT -->
 
-    <main class="main">
+    <main class="main-content">
+
+
+        <!-- TOPBAR -->
 
         <header class="topbar">
 
-            <button class="mobile-menu">
-                ☰
-            </button>
+            <div class="topbar-left">
 
-            <div>
+                <button
+                    class="mobile-menu"
+                    onclick="toggleSidebar()"
+                    aria-label="Open navigation">
+                    ☰
+                </button>
 
-                <h3 id="pageTitle">
-                    AI Assistant
-                </h3>
+                <div class="page-title">
 
-                <span class="status">
-                    ● Online
-                </span>
+                    <h2>Personal AI Assistant</h2>
+
+                    <span>Your intelligent workspace</span>
+
+                </div>
 
             </div>
 
-            <button class="profile">K</button>
+
+            <div class="topbar-right">
+
+                <div class="online-status">
+
+                    <span class="status-dot"></span>
+
+                    Online
+
+                </div>
+
+                <div class="profile-avatar">
+                    K
+                </div>
+
+            </div>
 
         </header>
 
 
-        <!-- CHAT SECTION -->
+        <!-- AI CHAT -->
 
-        <section id="chatSection"
-                 class="chat-area">
+        <section
+            id="chatSection"
+            class="chat-area">
 
             <div class="welcome">
 
@@ -126,7 +484,8 @@
 
                 <p>
                     Your personal intelligent assistant.
-                    Ask me anything and let's explore knowledge together.
+                    Ask me anything and let's explore
+                    knowledge together.
                 </p>
 
                 <div class="suggestions">
@@ -150,154 +509,113 @@
         </section>
 
 
-        <!-- PDF READER SECTION -->
+        <!-- CHAT INPUT -->
 
-        <section id="pdfSection"
-                 class="chat-area"
-                 style="display:none;">
+        <section
+            id="chatInputSection"
+            class="chat-input-section">
 
-            <div class="welcome">
+            <div class="input-container">
 
-                <div class="ai-icon">📄</div>
+                <textarea
+                    id="userInput"
+                    placeholder="Message KEYRADDIIN AI..."
+                    rows="1"
+                    aria-label="Write your message">
+                </textarea>
 
-                <h1>
-                    KEYRADDIIN PDF READER
-                </h1>
+                <button
+                    id="sendBtn"
+                    onclick="sendMessage()"
+                    aria-label="Send message">
+                    ➤
+                </button>
 
-                <p>
-                    Upload your PDF document and ask
-                    KEYRADDIIN AI questions about it.
-                </p>
+            </div>
+
+            <p class="input-disclaimer">
+                KEYRADDIIN AI can make mistakes.
+                Verify important information.
+            </p>
+
+        </section>
+
+
+        <!-- PDF READER -->
+
+        <section
+            id="pdfSection"
+            class="tool-section"
+            style="display:none;">
+
+            <div class="section-heading">
+
+                <div class="section-icon">▤</div>
+
+                <div>
+                    <h1>PDF Reader</h1>
+                    <p>Upload documents and ask KEYRADDIIN AI questions.</p>
+                </div>
 
             </div>
 
 
-            <!-- PDF UPLOAD -->
+            <div class="pdf-card">
 
-            <div style="
-                max-width:700px;
-                margin:20px auto;
-                padding:20px;
-                border-radius:15px;
-                background:#17233d;
-                color:white;
-            ">
+                <h3>Upload PDF Document</h3>
 
-                <h3>📚 Upload PDF Document</h3>
-
-                <p style="margin:12px 0;">
-                    Select a PDF file (Maximum 20 MB).
+                <p>
+                    Select a PDF document from your device.
+                    Maximum file size: 20 MB.
                 </p>
 
                 <input
                     type="file"
                     id="pdfFile"
-                    accept=".pdf,application/pdf"
-                >
-
-                <br><br>
+                    accept=".pdf,application/pdf">
 
                 <button
-                    onclick="uploadPDF()"
-                    style="
-                        padding:12px 20px;
-                        border:0;
-                        border-radius:8px;
-                        background:#526dff;
-                        color:white;
-                        cursor:pointer;
-                    "
-                >
+                    id="pdfUploadBtn"
+                    class="primary-btn"
+                    onclick="uploadPDF()">
                     Upload PDF
                 </button>
 
-                <p id="pdfStatus"
-                   style="margin-top:15px;">
-                </p>
+                <div
+                    id="pdfUploadStatus"
+                    class="tool-status"
+                    role="status"
+                    aria-live="polite">
+                </div>
 
             </div>
 
 
-            <!-- PDF INFORMATION -->
+            <div class="pdf-card">
 
-            <div id="pdfInformation"
-                 style="
-                    display:none;
-                    max-width:700px;
-                    margin:20px auto;
-                    padding:20px;
-                    border-radius:15px;
-                    background:#17233d;
-                    color:white;
-                 ">
+                <h3>Ask Your PDF</h3>
 
-                <h3>📖 PDF Information</h3>
-
-                <p id="pdfName"></p>
-
-                <p id="pdfPages"></p>
-
-                <p id="pdfCharacters"></p>
-
-            </div>
-
-
-            <!-- PDF QUESTION -->
-
-            <div id="pdfQuestionArea"
-                 style="
-                    display:none;
-                    max-width:700px;
-                    margin:20px auto;
-                    padding:20px;
-                    border-radius:15px;
-                    background:#17233d;
-                    color:white;
-                 ">
-
-                <h3>🤖 Ask KEYRADDIIN AI</h3>
-
-                <p style="margin:12px 0;">
-                    Ask anything about your PDF.
+                <p>
+                    Ask questions about your uploaded document.
                 </p>
 
                 <textarea
                     id="pdfQuestion"
-                    placeholder="Ask a question about this PDF..."
-                    rows="4"
-                    style="
-                        width:100%;
-                        padding:12px;
-                        border-radius:8px;
-                        border:1px solid #526dff;
-                        background:#101a2d;
-                        color:white;
-                        resize:vertical;
-                    "
-                ></textarea>
-
-                <br><br>
+                    placeholder="Write your question here..."
+                    rows="4">
+                </textarea>
 
                 <button
-                    onclick="askPDF()"
-                    style="
-                        padding:12px 20px;
-                        border:0;
-                        border-radius:8px;
-                        background:#526dff;
-                        color:white;
-                        cursor:pointer;
-                    "
-                >
-                    Ask AI ➤
+                    id="pdfAskBtn"
+                    class="primary-btn"
+                    onclick="askPDF()">
+                    Ask KEYRADDIIN AI
                 </button>
 
-                <div id="pdfAnswer"
-                     style="
-                        margin-top:20px;
-                        line-height:1.7;
-                        white-space:pre-wrap;
-                     ">
+                <div
+                    id="pdfAnswer"
+                    class="pdf-answer"
+                    aria-live="polite">
                 </div>
 
             </div>
@@ -305,261 +623,403 @@
         </section>
 
 
-        <!-- CHAT INPUT -->
+        <!-- AI MEMORY -->
 
-        <footer class="input-section"
-                id="chatInputSection">
+        <section
+            id="memorySection"
+            class="tool-section"
+            style="display:none;">
 
-            <div class="input-box">
+            <div class="section-heading">
 
-                <textarea
-                    id="userInput"
-                    placeholder="Message KEYRADDIIN AI..."
-                    rows="1">
-                </textarea>
+                <div class="section-icon">▣</div>
 
-                <button id="sendBtn"
-                        onclick="sendMessage()">
-                    ➤
-                </button>
+                <div>
+                    <h1>AI Memory</h1>
+                    <p>Your personal AI memory workspace.</p>
+                </div>
 
             </div>
 
-            <p class="disclaimer">
-                KEYRADDIIN PERSONAL AI V2.0
-                • Your Knowledge Partner
-            </p>
+            <div class="feature-card">
 
-        </footer>
+                <h3>AI Memory Management</h3>
+
+                <p>
+                    The memory management interface will be connected
+                    in a future update.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- AI TEACHER -->
+
+        <section
+            id="teacherSection"
+            class="tool-section"
+            style="display:none;">
+
+            <div class="section-heading">
+
+                <div class="section-icon">✎</div>
+
+                <div>
+                    <h1>AI Teacher</h1>
+                    <p>Your personal learning workspace.</p>
+                </div>
+
+            </div>
+
+            <div class="feature-card">
+
+                <h3>AI Teacher</h3>
+
+                <p>
+                    Your AI assistant can already help you
+                    understand subjects through AI Chat.
+                    A dedicated teacher interface is planned.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- VOICE ASSISTANT -->
+
+        <section
+            id="voiceSection"
+            class="tool-section"
+            style="display:none;">
+
+            <div class="section-heading">
+
+                <div class="section-icon">◉</div>
+
+                <div>
+                    <h1>Voice Assistant</h1>
+                    <p>Voice interaction workspace.</p>
+                </div>
+
+            </div>
+
+            <div class="feature-card">
+
+                <h3>Voice Assistant</h3>
+
+                <p>
+                    Voice interaction features are not connected yet.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- SETTINGS -->
+
+        <section
+            id="settingsSection"
+            class="tool-section"
+            style="display:none;">
+
+            <div class="section-heading">
+
+                <div class="section-icon">⚙</div>
+
+                <div>
+                    <h1>Settings</h1>
+                    <p>Application information.</p>
+                </div>
+
+            </div>
+
+            <div class="feature-card">
+
+                <h3>KEYRADDIIN PERSONAL AI</h3>
+
+                <p>Version: 2.0</p>
+                <p>Platform: Web Application</p>
+                <p>Developer: KEYRADDIIN MEDIA</p>
+                <p>Backend: Render API</p>
+
+            </div>
+
+        </section>
 
     </main>
 
 </div>
 
 
-<!-- APP JAVASCRIPT -->
-
-<script src="app.js"></script>
-
-
-<!-- PDF READER JAVASCRIPT -->
+<!-- NAVIGATION -->
 
 <script>
 
-    // ==================================
-    // PDF READER SYSTEM
-    // ==================================
+function showSection(sectionId, button) {
 
-    const PDF_API_BASE_URL = "https://keyraddiin-personal-ai-nemg.onrender.com";
+    const sections = [
+        "chatSection",
+        "pdfSection",
+        "memorySection",
+        "teacherSection",
+        "voiceSection",
+        "settingsSection"
+    ];
 
+    sections.forEach(id => {
 
-    let currentPDFText = "";
+        const section = document.getElementById(id);
 
+        if (section) {
+            section.style.display = "none";
+        }
 
-    // ==================================
-    // CHANGE APP SECTION
-    // ==================================
+    });
 
-    function showSection(sectionId, button) {
+    const selected = document.getElementById(sectionId);
 
-        document.getElementById("chatSection").style.display = "none";
+    if (selected) {
+        selected.style.display =
+            sectionId === "chatSection" ? "flex" : "block";
+    }
 
-        document.getElementById("pdfSection").style.display = "none";
+    const chatInput = document.getElementById("chatInputSection");
 
-        document.getElementById("chatInputSection").style.display = "none";
+    chatInput.style.display =
+        sectionId === "chatSection" ? "block" : "none";
 
-        document.getElementById(sectionId).style.display = "block";
+    document.querySelectorAll(".nav-item").forEach(item => {
+        item.classList.remove("active");
+    });
 
-        document.querySelectorAll(".menu-item").forEach(item => {
-
-            item.classList.remove("active");
-
-        });
-
+    if (button) {
         button.classList.add("active");
-
-        document.getElementById("pageTitle").textContent =
-            sectionId === "pdfSection"
-                ? "PDF Reader"
-                : "AI Assistant";
-
     }
 
+    closeSidebar();
 
-    // ==================================
-    // UPLOAD PDF
-    // ==================================
+}
 
-    async function uploadPDF() {
 
-        const fileInput = document.getElementById("pdfFile");
+function startNewChat() {
 
-        const status = document.getElementById("pdfStatus");
-
-        const file = fileInput.files[0];
-
-        if (!file) {
-
-            status.textContent = "Please select a PDF file.";
-
-            return;
-
-        }
-
-        if (file.size > 20 * 1024 * 1024) {
-
-            status.textContent = "PDF must be smaller than 20 MB.";
-
-            return;
-
-        }
-
-        if (file.type !== "application/pdf" &&
-            !file.name.toLowerCase().endsWith(".pdf")) {
-
-            status.textContent = "Only PDF files are supported.";
-
-            return;
-
-        }
-
-        status.textContent = "Uploading and processing PDF...";
-
-        currentPDFText = "";
-
-        document.getElementById("pdfInformation").style.display = "none";
-
-        document.getElementById("pdfQuestionArea").style.display = "none";
-
-        try {
-
-            const formData = new FormData();
-
-            formData.append("file", file);
-
-            const response = await fetch(
-                PDF_API_BASE_URL + "/pdf/upload",
-                {
-                    method: "POST",
-                    body: formData
-                }
-            );
-
-            const result = await response.json();
-
-            if (!response.ok) {
-
-                throw new Error(
-                    result.detail || "PDF upload failed."
-                );
-
-            }
-
-            currentPDFText = result.text;
-
-            document.getElementById("pdfName").textContent =
-                "File: " + result.filename;
-
-            document.getElementById("pdfPages").textContent =
-                "Pages: " + result.total_pages;
-
-            document.getElementById("pdfCharacters").textContent =
-                "Characters: " + result.characters;
-
-            document.getElementById("pdfInformation").style.display = "block";
-
-            document.getElementById("pdfQuestionArea").style.display = "block";
-
-            status.textContent = "PDF uploaded successfully!";
-
-        }
-
-        catch (error) {
-
-            status.textContent = "Error: " + error.message;
-
-        }
-
+    if (typeof newChat === "function") {
+        newChat();
     }
 
+    const chatButton = document.querySelector(".nav-item");
 
-    // ==================================
-    // ASK AI ABOUT PDF
-    // ==================================
+    showSection("chatSection", chatButton);
 
-    async function askPDF() {
+}
 
-        const questionInput = document.getElementById("pdfQuestion");
 
-        const answerArea = document.getElementById("pdfAnswer");
+function toggleSidebar() {
 
-        const question = questionInput.value.trim();
+    document.getElementById("sidebar")
+        .classList.toggle("sidebar-open");
 
-        if (!currentPDFText) {
+    document.getElementById("sidebarOverlay")
+        .classList.toggle("overlay-visible");
 
-            answerArea.textContent = "Please upload a PDF first.";
+}
 
-            return;
 
-        }
+function closeSidebar() {
 
-        if (!question) {
+    document.getElementById("sidebar")
+        .classList.remove("sidebar-open");
 
-            answerArea.textContent = "Please enter your question.";
+    document.getElementById("sidebarOverlay")
+        .classList.remove("overlay-visible");
 
-            return;
-
-        }
-
-        answerArea.textContent = "KEYRADDIIN AI is thinking...";
-
-        try {
-
-            const response = await fetch(
-                PDF_API_BASE_URL + "/pdf/ask",
-                {
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-
-                    body: JSON.stringify({
-
-                        pdf_text: currentPDFText,
-
-                        question: question
-
-                    })
-
-                }
-            );
-
-            const result = await response.json();
-
-            if (!response.ok) {
-
-                throw new Error(
-                    result.detail || "AI request failed."
-                );
-
-            }
-
-            answerArea.textContent = result.response;
-
-        }
-
-        catch (error) {
-
-            answerArea.textContent =
-                "Error: " + error.message;
-
-        }
-
-    }
+}
 
 </script>
 
-</body>
 
+<!-- PDF API -->
+
+<script>
+
+const PDF_API_BASE_URL =
+    "https://keyraddiin-personal-ai-v2.onrender.com";
+
+let uploadedPDF = false;
+let uploadedPDFText = "";
+
+
+document.getElementById("pdfFile")
+    .addEventListener("change", function() {
+
+        uploadedPDF = false;
+        uploadedPDFText = "";
+
+        document.getElementById("pdfUploadStatus").textContent = "";
+        document.getElementById("pdfAnswer").textContent = "";
+
+    });
+
+
+async function uploadPDF() {
+
+    const fileInput = document.getElementById("pdfFile");
+    const status = document.getElementById("pdfUploadStatus");
+    const button = document.getElementById("pdfUploadBtn");
+
+    const file = fileInput.files[0];
+
+    if (!file) {
+        status.textContent = "Please select a PDF file.";
+        return;
+    }
+
+    if (
+        file.type !== "application/pdf" &&
+        !file.name.toLowerCase().endsWith(".pdf")
+    ) {
+        status.textContent = "Only PDF files are allowed.";
+        return;
+    }
+
+    if (file.size > 20 * 1024 * 1024) {
+        status.textContent = "Maximum file size is 20 MB.";
+        return;
+    }
+
+    uploadedPDF = false;
+    uploadedPDFText = "";
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    button.disabled = true;
+    status.textContent = "Uploading and processing your PDF...";
+
+    try {
+
+        const response = await fetch(
+            `${PDF_API_BASE_URL}/pdf/upload`,
+            {
+                method: "POST",
+                body: formData
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.detail || data.error || "PDF upload failed."
+            );
+        }
+
+        if (!data.text || !data.text.trim()) {
+            throw new Error("No readable text found in this PDF.");
+        }
+
+        uploadedPDFText = data.text.substring(0, 80000);
+        uploadedPDF = true;
+
+        status.textContent =
+            "PDF uploaded successfully! " +
+            (data.total_pages || 0) +
+            " pages processed. You can now ask questions.";
+
+        if (data.text.length > 80000) {
+            status.textContent +=
+                " Only the first 80,000 characters will be used.";
+        }
+
+    } catch (error) {
+
+        console.error("PDF UPLOAD ERROR:", error);
+
+        status.textContent = "Upload error: " + error.message;
+
+    } finally {
+
+        button.disabled = false;
+
+    }
+
+}
+
+
+async function askPDF() {
+
+    const question =
+        document.getElementById("pdfQuestion").value.trim();
+
+    const answer = document.getElementById("pdfAnswer");
+    const button = document.getElementById("pdfAskBtn");
+
+    if (!uploadedPDF || !uploadedPDFText) {
+        answer.textContent = "Please upload a PDF document first.";
+        return;
+    }
+
+    if (!question) {
+        answer.textContent = "Please enter your question.";
+        return;
+    }
+
+    button.disabled = true;
+    answer.textContent = "KEYRADDIIN AI is reading your PDF...";
+
+    try {
+
+        const response = await fetch(
+            `${PDF_API_BASE_URL}/pdf/ask`,
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    pdf_text: uploadedPDFText,
+                    question: question
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.detail || data.error || "PDF question failed."
+            );
+        }
+
+        answer.textContent =
+            data.response || data.answer || "No answer received.";
+
+    } catch (error) {
+
+        console.error("PDF QUESTION ERROR:", error);
+
+        answer.textContent = "Error: " + error.message;
+
+    } finally {
+
+        button.disabled = false;
+
+    }
+
+}
+
+</script>
+
+
+<!-- MAIN CHAT JAVASCRIPT -->
+
+<script src="app.js"></script>
+
+</body>
 </html>
